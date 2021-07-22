@@ -1,6 +1,5 @@
-/*---------------------------------------------------------
- * Copyright (C) Microsoft Corporation. All rights reserved.
- *--------------------------------------------------------*/
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 
 import { connect, Socket } from "net";
 import { DebugAdapter, Event, DebugProtocolMessage, EventEmitter } from "vscode";
@@ -8,7 +7,7 @@ import { Logger } from "./logging";
 
 export class NamedPipeDebugAdapter implements DebugAdapter {
     private static readonly TWO_CRLF = '\r\n\r\n';
-    private static readonly HEADER_LINESEPARATOR = /\r?\n/;	// allow for non-RFC 2822 conforming line separators
+    private static readonly HEADER_LINESEPARATOR = /\r?\n/;    // allow for non-RFC 2822 conforming line separators
     private static readonly HEADER_FIELDSEPARATOR = /: */;
 
     private readonly _logger: Logger;
@@ -53,6 +52,7 @@ export class NamedPipeDebugAdapter implements DebugAdapter {
 
         // When the socket closes, end the session.
         this._debugServiceSocket.on("close", () => { this.dispose(); });
+        this._debugServiceSocket.on("end", () => { this.dispose(); });
     }
 
     public handleMessage(message: DebugProtocolMessage): void {
@@ -66,6 +66,7 @@ export class NamedPipeDebugAdapter implements DebugAdapter {
 
     public dispose() {
         this._debugServiceSocket.destroy();
+        this._sendMessage.fire({ type: 'event', event: 'terminated' });
         this._sendMessage.dispose();
     }
 

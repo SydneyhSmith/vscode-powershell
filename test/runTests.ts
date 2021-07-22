@@ -1,10 +1,13 @@
-/*---------------------------------------------------------
- * Copyright (C) Microsoft Corporation. All rights reserved.
- *--------------------------------------------------------*/
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 
 import * as path from "path";
 
 import { runTests } from "vscode-test";
+
+// tslint:disable-next-line: no-var-requires
+const PackageJSON: any = require("../../package.json");
+const testExtensionId = `${PackageJSON.publisher}.${PackageJSON.name}`;
 
 async function main() {
     try {
@@ -17,7 +20,16 @@ async function main() {
         const extensionTestsPath = path.resolve(__dirname, "./testRunner");
 
         // Download VS Code, unzip it and run the integration test from the local directory.
-        await runTests({ extensionDevelopmentPath, extensionTestsPath, launchArgs: ["."] });
+        await runTests({
+            extensionDevelopmentPath,
+            extensionTestsPath,
+            launchArgs: [
+                "--disable-extensions",
+                "--enable-proposed-api", testExtensionId,
+                "./test"
+            ],
+            version: "insiders"
+        });
     } catch (err) {
         // tslint:disable-next-line:no-console
         console.error(err);

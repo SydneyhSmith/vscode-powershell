@@ -1,5 +1,3 @@
-name: PR-$(System.PullRequest.PullRequestNumber)-$(Date:yyyyMMdd)$(Rev:.rr)
-
 variables:
   # Don't download unneeded packages
   - name: DOTNET_SKIP_FIRST_TIME_EXPERIENCE
@@ -9,35 +7,33 @@ variables:
     value: 'true'
 
 trigger:
-  batch: true
   branches:
     include:
-      - master
-      - legacy/1.x
-  paths:
-    exclude:
-      - /.dependabot/*
-      - /.poshchan/*
-      - /.github/**/*
-      - /.vscode/**/*
-      - /.vsts-ci/misc-analysis.yml
-      - /tools/**/*
-      - .editorconfig
-      - .gitattributes
-      - .gitignore
-      - /docs/**/*
-      - /CHANGELOG.md
-      - /CONTRIBUTING.md
-      - /README.md
-      - /LICENSE
-      - /CODE_OF_CONDUCT.md
+      - release/*
+
+resources:
+  repositories:
+  - repository: ComplianceRepo
+    type: github
+    endpoint: ComplianceGHRepo
+    name: PowerShell/Compliance
+  pipelines:
+  - pipeline: PowerShellEditorServices
+    source: PowerShellEditorServices
+    trigger:
+      branches:
+        include:
+        - release/*
+      tags:
+      - v*
 
 jobs:
-
 - job: 'ReleaseBuild'
   displayName: 'Build release'
   pool:
-    name: 'Package ES CodeHub Lab E'
-    demands: DotNetFramework
+    name: '1ES'
+    demands: ImageOverride -equals MMS2019
+  variables:
+  - group: ESRP
   steps:
   - template: templates/release-general.yml

@@ -13,40 +13,22 @@ trigger:
   branches:
     include:
       - master
-      - legacy/1.x
-  paths:
-    exclude:
-      - /.dependabot/*
-      - /.poshchan/*
-      - /.github/**/*
-      - /.vscode/**/*
-      - /.vsts-ci/misc-analysis.yml
-      - /tools/**/*
-      - .editorconfig
-      - .gitattributes
-      - .gitignore
-      - /docs/**/*
-      - /CHANGELOG.md
-      - /CONTRIBUTING.md
-      - /README.md
-      - /LICENSE
-      - /CODE_OF_CONDUCT.md
 
 jobs:
 - job: Windows
   pool:
-    vmImage: 'VS2017-Win2016'
+    vmImage: 'windows-2019'
   steps:
   - template: templates/ci-general.yml
 
 - job: macOS
   pool:
-    vmImage: 'macOS-10.14'
+    vmImage: 'macOS-10.15'
   steps:
   - template: templates/ci-general.yml
 
 - job: Linux
   pool:
-    vmImage: 'Ubuntu-16.04'
+    vmImage: 'Ubuntu-20.04'
   steps:
   - template: templates/ci-general.yml

@@ -1,6 +1,5 @@
-/*---------------------------------------------------------
- * Copyright (C) Microsoft Corporation. All rights reserved.
- *--------------------------------------------------------*/
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 
 import { spawn } from "child_process";
 import * as fs from "fs";
@@ -11,7 +10,8 @@ import * as semver from "semver";
 import * as stream from "stream";
 import * as util from "util";
 import { MessageItem, ProgressLocation, window } from "vscode";
-import { LanguageClient } from "vscode-languageclient";
+
+import { LanguageClient } from "vscode-languageclient/node";
 import { SessionManager } from "../session";
 import * as Settings from "../settings";
 import { isMacOS, isWindows } from "../utils";
@@ -89,11 +89,11 @@ export async function InvokePowerShellUpdateCheck(
         },
         {
             id: 1,
-            title: "Not now",
+            title: "Not Now",
         },
         {
             id: 2,
-            title: "Do not show this notification again",
+            title: "Don't Show Again",
         },
     ];
 
@@ -172,8 +172,8 @@ export async function InvokePowerShellUpdateCheck(
 
             } else if (isMacOS) {
                 const script = release.isPreview
-                    ? "brew cask upgrade powershell-preview"
-                    : "brew cask upgrade powershell";
+                    ? "brew upgrade --cask powershell-preview"
+                    : "brew upgrade --cask powershell";
 
                 await languageServerClient.sendRequest(EvaluateRequestType, {
                     expression: script,

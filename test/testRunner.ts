@@ -1,6 +1,5 @@
-/*---------------------------------------------------------
- * Copyright (C) Microsoft Corporation. All rights reserved.
- *--------------------------------------------------------*/
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 
 import * as glob from "glob";
 import * as Mocha from "mocha";
@@ -9,8 +8,8 @@ import * as path from "path";
 export function run(): Promise<void> {
     // Create the mocha test
     const mocha = new Mocha({
-        ui: "tdd", 		// the TDD UI is being used in extension.test.ts (suite, test, etc.)
-        useColors: !process.env.TF_BUILD, // colored output from test results
+        ui: "tdd",         // the TDD UI is being used in extension.test.ts (suite, test, etc.)
+        color: !process.env.TF_BUILD, // colored output from test results
         reporter: "mocha-multi-reporters",
         timeout: 5000,
         reporterOptions: {

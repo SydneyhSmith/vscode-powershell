@@ -1,5 +1,383 @@
 # PowerShell Extension Release History
 
+## v2021.7.0-preview
+### Thursday, July 15, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 👷 [vscode-powershell #3458](https://github.com/PowerShell/vscode-powershell/pull/3458) - Automate more of the release.
+- ✨ 👷 [vscode-powershell #3439](https://github.com/PowerShell/vscode-powershell/pull/3439) - Fix `Package` task.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- ✨ 🚨 [PowerShellEditorServices #1522](https://github.com/PowerShell/PowerShellEditorServices/pull/1522) - Run new PSReadLine test on Windows.
+- ✨ 📖 [PowerShellEditorServices #1519](https://github.com/PowerShell/PowerShellEditorServices/pull/1519) - Update README.md. (Thanks @vladdoster!)
+- ✨ 🙏 [PowerShellEditorServices #1493](https://github.com/PowerShell/PowerShellEditorServices/pull/1514) - Load only bundled `PSReadLine`.
+- 🐛 👷 [PowerShellEditorServices #1513](https://github.com/PowerShell/PowerShellEditorServices/pull/1513) - Import `InvokePesterStub.ps1` from `vscode-powershell` (with history).
+- 🐛 🛫 [PowerShellEditorServices #1503](https://github.com/PowerShell/PowerShellEditorServices/pull/1504) - Handle `incomingSettings` and `profileObject` being null. (Thanks @dkattan!)
+
+
+## v2021.6.2
+### Thursday, June 24, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 👷🐛 [vscode-powershell #2536](https://github.com/PowerShell/vscode-powershell/pull/3431) - Release refinements.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 👷🐛 [PowerShellEditorServices #1509](https://github.com/PowerShell/PowerShellEditorServices/issues/1509) Fix signing of files in release.
+
+
+## v2021.6.1
+### Monday, June 21, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 📁✨ [vscode-powershell #3334](https://github.com/PowerShell/vscode-powershell/pull/3416) - Explicitly disable extension for untrusted workspaces.
+- 📺 [vscode-powershell #3378](https://github.com/PowerShell/vscode-powershell/pull/3413) - Include `$` in PowerShell word separators.
+- #️⃣ 🙏 [vscode-powershell #3390](https://github.com/PowerShell/vscode-powershell/pull/3392) - Change OS-architecture check to work with other locales. (Thanks @mat-ocl!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🐛 [PowerShellEditorServices #1495](https://github.com/PowerShell/PowerShellEditorServices/pull/1500) - Prevent some exceptions.
+- #️⃣ 🙏 [vscode-powershell #3395](https://github.com/PowerShell/PowerShellEditorServices/pull/1494) - Work around `dotnet publish` bug.
+
+## v2021.5.1
+### Thursday, May 27, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+This stable release includes all the changes in the previews since v2021.2.2, plus the
+following:
+
+- 🐛🔧 [vscode-powershell #3221](https://github.com/PowerShell/vscode-powershell/pull/3377) - Disable semantic highlighting by default.
+- 📖📺✨ [vscode-powershell #1943](https://github.com/PowerShell/vscode-powershell/pull/3372) - Note that ISE theme is included in this extension.
+- 🔧🔍🐛✨ [vscode-powershell #3338](https://github.com/PowerShell/vscode-powershell/pull/3357) - Don't prompt to save untitled PowerShell files when debugging.
+
+Since we have disabled semantic highlighting by default now, if you wish to re-enable it,
+use:
+
+```json
+"[powershell]": {
+    "editor.semanticHighlighting.enabled": true
+}
+```
+
+We now also remove `-` and `$` from the word separators by default for PowerShell files.
+To add them back, use:
+
+```json
+"[powershell]": {
+    "editor.wordSeparators": "`~!@#$%^&*()-=+[{]}\\|;:'\",.<>/?"
+}
+```
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+This stable release includes all the changes in the previews since v2.3.0, plus the following:
+
+- ✨👷 [PowerShellEditorServices #1491](https://github.com/PowerShell/PowerShellEditorServices/pull/1491) - Bump OmniSharp to `v0.19.2`.
+- 🧠🐛 [vscode-powershell #715](https://github.com/PowerShell/PowerShellEditorServices/pull/1484) - Fix unintentional module import. (Thanks @MartinGC94!)
+
+The most significant change is the update to [OmniSharp
+v0.19.2](https://github.com/OmniSharp/csharp-language-server-protocol/releases/tag/v0.19.2),
+from the previous version v0.18.3, released in November 2020. OmniSharp is the underlying
+Language Server Protocol and Debug Adapter Protocol server library, and as such is our
+biggest dependency. This update brings us to the LSP 3.16 and DAP 1.48.x specifications,
+enabling us to start incorporating all the latest LSP changes, and it includes numerous
+bug fixes and enhancements resulting in a faster and more stable server and extension
+experience.
+
+## v2021.5.0-preview
+### Friday, May 21, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🔗✨ [vscode-powershell #3359](https://github.com/PowerShell/vscode-powershell/pull/3359) - Exclude `-` and `$` from PowerShell `wordSeparators`.
+- 📺✨ [vscode-powershell #3351](https://github.com/PowerShell/vscode-powershell/pull/3356) - Use PowerShell terminal icon (when available).
+- 📖✨ [vscode-powershell #3339](https://github.com/PowerShell/vscode-powershell/pull/3340) - Update Description to reflect that PowerShell is for more than scripting. (Thanks @potatoqualitee!)
+- 📺🐛 [vscode-powershell #3320](https://github.com/PowerShell/vscode-powershell/pull/3329) - Fix duplicated command registrations. (Thanks @MartinGC94!)
+- 📖🐛 [vscode-powershell #2896](https://github.com/PowerShell/vscode-powershell/pull/3322) - Remove "All Rights Reserved" from copyright notices.
+-  [vscode-powershell #3179](https://github.com/PowerShell/vscode-powershell/pull/3179) - Update @types/vscode and `StatusBarItem` implementation.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🛫🐛 [vscode-powershell #3306](https://github.com/PowerShell/PowerShellEditorServices/pull/1481) - Bump OmniSharp to `v0.19.2-beta0002`.
+- 💭✨ [PowerShellEditorServices #1474](https://github.com/PowerShell/PowerShellEditorServices/pull/1474) - Add more logging and internal documentation.
+- 🚂✨ [PowerShellEditorServices #1467](https://github.com/PowerShell/PowerShellEditorServices/pull/1467) - Make code more explicit.
+- 📖🐛 [PowerShellEditorServices #1465](https://github.com/PowerShell/PowerShellEditorServices/pull/1466) - Remove "All Rights Reserved" from copyright notices.
+- 👷✨ [PowerShellEditorServices #1463](https://github.com/PowerShell/PowerShellEditorServices/pull/1464) - Enable CodeQL with `codeql-analysis.yml`.
+
+
+## v2021.4.2-preview
+### Monday, April 26, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 👷✨ [vscode-powershell #3268](https://github.com/PowerShell/vscode-powershell/pull/3292) - Add `Update-Version` to `ReleaseTools` module.
+- 👷🐛 [vscode-powershell #3282](https://github.com/PowerShell/vscode-powershell/pull/3286) - Fix release build pipeline.
+- 👷✨ [vscode-powershell #3275](https://github.com/PowerShell/vscode-powershell/pull/3275) - Update vsce to 1.87.1.
+- 👷✨ [vscode-powershell #3274](https://github.com/PowerShell/vscode-powershell/pull/3274) - Run `npm audit fix`.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🔍🐛 [PowerShellEditorServices #1460](https://github.com/PowerShell/PowerShellEditorServices/pull/1460) - Bump OmniSharp package to `0.19.2-beta0001`.
+- 👷🐛 [PowerShellEditorServices #1455](https://github.com/PowerShell/PowerShellEditorServices/pull/1456) - Fix version in module definition file.
+
+## v2021.4.1-preview
+### Friday, April 02, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 👷🐛 [vscode-powershell #3267](https://github.com/PowerShell/vscode-powershell/pull/3267) - Update download host of vscode. (Thanks @thosoo!)
+- 👷✨ [vscode-powershell #3195](https://github.com/PowerShell/vscode-powershell/pull/3265) - Create new `ReleaseTools` module.
+- 📺✨ [vscode-powershell #3236](https://github.com/PowerShell/vscode-powershell/pull/3237) - Use title case and shorter notification text. (Thanks @Tyriar!)
+- 🚨🐛 [vscode-powershell #3208](https://github.com/PowerShell/vscode-powershell/pull/3222) - Fix hardcoded extension name string.
+- 📖🐛 [vscode-powershell #3049](https://github.com/PowerShell/vscode-powershell/pull/3214) - Update examples-module to use Pester 5. (Thanks @nickkimbrough!)
+- 🐛 [vscode-powershell #3209](https://github.com/PowerShell/vscode-powershell/pull/3212) - Remove the rest of the experimental Notebook API.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+Please note that these changes were intended to be included in this preview
+release; however, a silent pipeline failure led to the previous version of
+PowerShellEditorServices being included instead. These changes will be included
+in the next preview release. See:
+[#3282](https://github.com/PowerShell/vscode-powershell/issues/3282)
+
+- 🧠✨ [PowerShellEditorServices #1176](https://github.com/PowerShell/PowerShellEditorServices/pull/1427) - Add '$' as trigger character for completion. (Thanks @MartinGC94!)
+- 👷🚨✨ [PowerShellEditorServices #1426](https://github.com/PowerShell/PowerShellEditorServices/pull/1426) - Bump CI images and enable tests on Apple M1.
+- ✨ [PowerShellEditorServices #1424](https://github.com/PowerShell/PowerShellEditorServices/pull/1424) - Update to use OmniSharp 0.19.0.
+- #️⃣ 🙏 [PowerShellEditorServices #1418](https://github.com/PowerShell/PowerShellEditorServices/pull/1418) - Update CHANGELOG for v2.3.0.
+- #️⃣ 🙏 [vscode-powershell #3180](https://github.com/PowerShell/PowerShellEditorServices/pull/1411) - Fix New-EditorFile failing when no Editor window open. (Thanks @corbob!)
+
+## v2021.2.2
+### Wednesday, February 24, 2021
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- 📺 ✨ New semantic highlighting. (Thanks @justinytchen!)
+- 🐢 ✨ Added Pester v5 support to problem matcher. (Thanks @fflaten!)
+- ✨ 👮 Updated PSScriptAnalyzer to 1.19.1. Fixes formatting bugs! (Thanks @bergmeister!)
+- 🛫 🐛 [vscode-powershell #3181](https://github.com/PowerShell/vscode-powershell/pull/3202) -
+  Fix PowerShell MSIX (Store) detection.
+- 🐛 Many squashed bugs! (See previews below for details.)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 👷 ✨ No changes, just releasing a stable version.
+
+## v2021.2.1-preview
+### Tuesday, February 23, 2021
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- 👷 🐛 [vscode-powershell #3197](https://github.com/PowerShell/vscode-powershell/pull/3197) -
+  Some improvements to the release scripts.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 📖 🐛 [PowerShellEditorServices #1416](https://github.com/PowerShell/PowerShellEditorServices/pull/1416) -
+  Fix some markdownlint errors in README.
+- 🛫 🐛 [PowerShellEditorServices #1415](https://github.com/PowerShell/PowerShellEditorServices/pull/1415) -
+  Fix configuration processing to ensure that profiles are loaded.
+
+## v2021.2.0-preview
+### Friday, February 19, 2021
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- 🛫 🐛 [vscode-powershell #3132](https://github.com/PowerShell/vscode-powershell/pull/3132) -
+  Use new brew cask installation syntax for PowerShell installation. (Thanks @philippkahr!)
+- 📺 🐛 [vscode-powershell #3177](https://github.com/PowerShell/vscode-powershell/pull/3177) -
+  Disable VSCode Notebook API prototype while the API is still unstable.
+- 👷 ✨ [vscode-powershell #3162](https://github.com/PowerShell/vscode-powershell/pull/3162) -
+  Rewrite release signing pipeline.
+- 💎 🐛 [vscode-powershell #3129](https://github.com/PowerShell/vscode-powershell/pull/3129) -
+  Add braces to PSCustomObject snippet to play nice with auto-closing pairs.
+- 📖 ✨ [vscode-powershell #3152](https://github.com/PowerShell/vscode-powershell/pull/3152) -
+  Add @andschwa to the README as maintainer.
+- 👷 🐛 [vscode-powershell #3099](https://github.com/PowerShell/vscode-powershell/pull/3099) -
+  Update dependencies to fix CI on macOS.
+- 🐢 🐛 [vscode-powershell #3089](https://github.com/PowerShell/vscode-powershell/pull/3089) -
+  Remove hardcoded output format.
+- 📖 🐛 [vscode-powershell #3086](https://github.com/PowerShell/vscode-powershell/pull/3086) -
+  Fix typo in description of legacy codelens description. (Thanks @nexxai!)
+- 🚂 ✨ [vscode-powershell #3053](https://github.com/PowerShell/vscode-powershell/pull/3053) -
+  Use VSCode telemetry endpoint for PSES telemetry.
+- 🚂 ✨ [vscode-powershell #3047](https://github.com/PowerShell/vscode-powershell/pull/3047) -
+  Update language server client.
+- 🐢 ✨ [vscode-powershell #2998](https://github.com/PowerShell/vscode-powershell/pull/2998) -
+  Added Pester v5 support to problem matcher. (Thanks @fflaten!)
+- ✂️ 🐛 [vscode-powershell #3023](https://github.com/PowerShell/vscode-powershell/pull/3023) -
+  Ensure help completions only run on powershell scripts.
+- 🛫 🐛 [vscode-powershell #2973](https://github.com/PowerShell/vscode-powershell/pull/2973) -
+  Fix session menu fails to open when PowerShell extension is starting. (Thanks @jeffpatton1971!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 👷 ✨ [PowerShellEditorServices #1408](https://github.com/PowerShell/PowerShellEditorServices/pull/1408) -
+  Rewrite release signing pipeline.
+- 🚨 ✨ [PowerShellEditorServices #1398](https://github.com/PowerShell/PowerShellEditorServices/pull/1398) -
+  Refactor e2e tests.
+- 🚂 ✨ [PowerShellEditorServices #1381](https://github.com/PowerShell/PowerShellEditorServices/pull/1381) -
+  Hook up Telemetry LSP event and add telemetry event when users opt-out/in to features.
+- 👷 🐛 [PowerShellEditorServices #1397](https://github.com/PowerShell/PowerShellEditorServices/pull/1397) -
+  More compliant NuGet.config.
+- 📺 🐛 [vscode-powershell #3071](https://github.com/PowerShell/PowerShellEditorServices/pull/1394) -
+  Fix #1393: Always use local help to return cmdlet help text. (Thanks @deadlydog!)
+- 🚂 ✨ [PowerShellEditorServices #1376](https://github.com/PowerShell/PowerShellEditorServices/pull/1376) -
+  Move to Omnisharp lib 0.18.x.
+- 🛫 🐛 [vscode-powershell #2965](https://github.com/PowerShell/PowerShellEditorServices/pull/1363) -
+  Fix error when started in low .NET versions.
+- 📖 🐛 [PowerShellEditorServices #1364](https://github.com/PowerShell/PowerShellEditorServices/pull/1364) -
+  Typos in README.md. (Thanks @robotboyfriend!)
+
+## v2020.9.0-preview
+### Wednesday, September 16, 2020
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- 📺✨ [vscode-powershell #2919](https://github.com/PowerShell/vscode-powershell/pull/2919) -
+  Create new Untitled Notebooks and support for Automatic Notebooks (`*.Notebook.ps1`).
+- 📺✨ [vscode-powershell #2935](https://github.com/PowerShell/vscode-powershell/pull/2935) -
+  Add ISE theme settings borders. (Thanks @CalistusK!)
+- 👷✨ [vscode-powershell #2922](https://github.com/PowerShell/vscode-powershell/pull/2922) -
+  Add editorconfig to recommended extensions for the local build. (Thanks @xtqqczze!)
+- 👷✨ [vscode-powershell #2889](https://github.com/PowerShell/vscode-powershell/pull/2889) -
+  Use spaces instead of tabs for consistency. (Thanks @xtqqczze!)
+- 👷✨ [vscode-powershell #2884](https://github.com/PowerShell/vscode-powershell/pull/2884) -
+  Update copyright header in *.ps1, *.psm1 files. (Thanks @xtqqczze!)
+- 🐢🐛 [vscode-powershell #2888](https://github.com/PowerShell/vscode-powershell/pull/2888) -
+  Fixed crash when running pester older than 3.4.5. (Thanks @EmmanuelPineiro!)
+- 👷✨ [vscode-powershell #2881](https://github.com/PowerShell/vscode-powershell/pull/2881) -
+  Remove UTF-8 BOM from misc text files. (Thanks @xtqqczze!)
+- 👷✨ [vscode-powershell #2876](https://github.com/PowerShell/vscode-powershell/pull/2876) -
+  Update text in LICENSE.txt. (Thanks @xtqqczze!)
+- 📺✨ [vscode-powershell #2861](https://github.com/PowerShell/vscode-powershell/pull/2861) -
+  Update LSP Client to use new Semantic Highlighting APIs. (Thanks @justinytchen!)
+- 👷✨ [vscode-powershell #2871](https://github.com/PowerShell/vscode-powershell/pull/2871) -
+  Prevent `Update Notebook dts` action from triggering on forked repositories. (Thanks @corbob!)
+- 🔧🐛 [vscode-powershell #2863](https://github.com/PowerShell/vscode-powershell/pull/2863) -
+  Fix migration of `codeFormatting.addWhitespaceAroundPipe` setting when it doesn't already exist.
+- 📺🐛 [vscode-powershell #2845](https://github.com/PowerShell/vscode-powershell/pull/2848) -
+  Handle block comments with text on the same line as <# #> in Notebook Mode.
+- ✨ [vscode-powershell #2855](https://github.com/PowerShell/vscode-powershell/pull/2855) -
+  Expose the extension integration API via exports instead of editor commands.
+- 📺✨ [vscode-powershell #2844](https://github.com/PowerShell/vscode-powershell/pull/2844) -
+  Use property scope in the PowerShell ISE theme for better Semantic Highlighting.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🧠✨ [vscode-powershell #2898](https://github.com/PowerShell/PowerShellEditorServices/pull/1352) -
+  Type and Namespace completions now have tooltips. (Thanks @AspenForester!)
+- 🛫🐛 [vscode-powershell #2719](https://github.com/PowerShell/PowerShellEditorServices/pull/1349) -
+  Fix startup assembly version loading issue in PowerShell 6 and up.
+- 🔗🐛 [vscode-powershell #2810](https://github.com/PowerShell/PowerShellEditorServices/pull/1348) -
+  Fix reference number on Windows due to directory separator difference on Windows.
+- 📺✨ [PowerShellEditorServices #1343](https://github.com/PowerShell/PowerShellEditorServices/pull/1343) -
+  Updated Semantic Handler to work with new LSP APIs. (Thanks @justinytchen!)
+- 📺✨ [PowerShellEditorServices #1337](https://github.com/PowerShell/PowerShellEditorServices/pull/1337) -
+  Treat `Member`s as `Properties` in Semantic Highlighting for better accuracy.
+
+## v2020.7.0-preview
+### Thursday, July 30, 2020
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- 📺✨ [vscode-powershell #2834](https://github.com/PowerShell/vscode-powershell/pull/2834) -
+  Enable LSP proposed features for Semantic Highlighting. Also allow the PowerShell ISE theme to use Semantic Highlighting.
+- 👮✨ [vscode-powershell #2831](https://github.com/PowerShell/vscode-powershell/pull/2831) -
+  Expose new formatter setting `powershell.codeFormatting.useConstantStrings` from PSScriptAnalyzer 1.19.1. (Thanks @bergmeister!)
+- 📺✨ [vscode-powershell #2789](https://github.com/PowerShell/vscode-powershell/pull/2789) -
+  Initial Notebook UI Mode in VS Code Insiders.
+- 🔧✨ [vscode-powershell #2693](https://github.com/PowerShell/vscode-powershell/pull/2830) -
+  Migrate setting value of `powershell.codeFormatting.whitespaceAroundPipe` to new setting `powershell.codeFormatting.addWhitespaceAroundPipe` automatically. (Thanks @bergmeister!)
+- 🧹✨ [vscode-powershell #2685](https://github.com/PowerShell/vscode-powershell/pull/2685) -
+  Refactor vscode-powershell IFeature classes to separate them into features that depend on the language server and features that don't. (Thanks @bergmeister!)
+- ✨ [vscode-powershell #2799](https://github.com/PowerShell/vscode-powershell/pull/2799) -
+  Initial VSCode-extension-facing PowerShell API: registering, unregistering, and getting PowerShell version details.
+- 🛫✨ [vscode-powershell #2796](https://github.com/PowerShell/vscode-powershell/pull/2796) -
+  Add setting to change the cwd of the Powershell Integrated Console. (Thanks @jwfx!)
+- 🛫🐛 [vscode-powershell #2780](https://github.com/PowerShell/vscode-powershell/pull/2788) -
+  Fix quoting of banner for global tool.
+- 🔍🐛 [vscode-powershell #2765](https://github.com/PowerShell/vscode-powershell/pull/2775) -
+  Emit 'terminated' event if PSES is restarted.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 📺✨ [PowerShellEditorServices #1328](https://github.com/PowerShell/PowerShellEditorServices/pull/1328) -
+  Enable handlers for Semantic Highlighting for better highlighting accuracy.
+- 👮✨ [PowerShellEditorServices #1333](https://github.com/PowerShell/PowerShellEditorServices/pull/1333) -
+  Expose new rule PSAvoidUsingDoubleQuotesForConstantString added in PSScriptAnalyzer 1.19.1. (Thanks @bergmeister!)
+- 📺✨ [PowerShellEditorServices #1321](https://github.com/PowerShell/PowerShellEditorServices/pull/1321) -
+  Needed changes for Notebook UI Support.
+- 🛫✨ [PowerShellEditorServices #1323](https://github.com/PowerShell/PowerShellEditorServices/pull/1323) -
+  Add cwd property to settings. (Thanks @jwfx!)
+- 🛫🐛 [PowerShellEditorServices #1317](https://github.com/PowerShell/PowerShellEditorServices/pull/1318) -
+  Move tests to PS7 and PS7.1 and fix IsNetCore check.
+- 🔗✨ [PowerShellEditorServices #1316](https://github.com/PowerShell/PowerShellEditorServices/pull/1316) -
+  Return null when Hover request is cancelled or no symbol details. (Thanks @ralish!)
+- 🛫🐛 [vscode-powershell #2763](https://github.com/PowerShell/PowerShellEditorServices/pull/1315) -
+  TLS 1.2 Support When Installing PackageManagement Module. (Thanks @serkanz!)
+
+## v2020.6.0
+### Thursday, June 11, 2020
+
+- ⚡️🧠 Better performance of overall.
+- ✨🛫 Support for ConstrainedLanguage mode.
+- 🐛 Many squashed bugs
+- ✨👮 Updated PSScriptAnalyzer to 1.19.0.
+      - More formatting settings! (Thanks @bergmeister!)
+- 📟 ✨ Updated PSReadLine to 2.0.2.
+(From now on,
+the stable extension will have the latest stable version of PSReadLine and the PowerShell Preview extension will have the latest preview of PSReadLine)
+
+## v2020.6.1-preview
+### Monday, June 08, 2020
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- 👷 ✨ [vscode-powershell #2740](https://github.com/PowerShell/vscode-powershell/pull/2740) -
+  Add CodeQL security scanning. (Thanks @jhutchings1!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🔗 🐛 [PowerShellEditorServices #1304](https://github.com/PowerShell/PowerShellEditorServices/pull/1304) -
+  Use From instead of FromFileSystem fixing CodeLens references.
+- 📟 ✨ [PowerShellEditorServices #1290](https://github.com/PowerShell/PowerShellEditorServices/pull/1290) -
+  Allow PSReadLine to work in ConstrainedLanguage mode.
+- 📟 ✨ The PowerShell Preview extension now uses v2.1.0-preview.2 of PSReadLine.
+If you want the predictions feature back, add the following to your `$PROFILE`:
+
+```pwsh
+Set-PSReadLineOption -PredictionSource History
+```
+
+## v2020.6.0-preview
+### Monday, June 01, 2020
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- 🐢✨ [vscode-powershell #2730](https://github.com/PowerShell/vscode-powershell/pull/2730) -
+  Support adding an `OutputFile` and allow running Pester tests from the command pallet.
+- 🔗🐛 [vscode-powershell #2705](https://github.com/PowerShell/vscode-powershell/pull/2705) -
+  Tweak CodeLens logic now that we use Omnisharp's serializer.
+- 📺✨ [vscode-powershell #2702](https://github.com/PowerShell/vscode-powershell/pull/2702) -
+  Add coloring for `$` and remove it from `wordSepartors`. (Thanks @MJECloud!)
+- 📺✨ [vscode-powershell #2704](https://github.com/PowerShell/vscode-powershell/pull/2704) -
+  Add buttons for moving the terminal pane around. (Thanks @MartinGC94!)
+- 👮‍🐛 [vscode-powershell #2703](https://github.com/PowerShell/vscode-powershell/pull/2703) -
+  Tweak `whitespaceAroundPipe` settings migration logic to do it only once. (Thanks @bergmeister!)
+- 👮‍🐛 [vscode-powershell #2698](https://github.com/PowerShell/vscode-powershell/pull/2698) -
+  Change default of `powershell.codeFormatting.pipelineIndentationStyle` from None back to NoIndentation due to PSScriptAnalyzer bug. (Thanks @bergmeister!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🚂✨ [PowerShellEditorServices #1301](https://github.com/PowerShell/PowerShellEditorServices/pull/1301) -
+  Fix `AddLanguageProtocolLogging` OmniSharp breaking change.
+- 🚨✨ [PowerShellEditorServices #1298](https://github.com/PowerShell/PowerShellEditorServices/pull/1298) -
+  Remove leftover csproj reference to already removed project in test project PowerShellEditorServices.Test.Host.csproj. (Thanks @bergmeister!)
+- 🚂✨ [PowerShellEditorServices #1300](https://github.com/PowerShell/PowerShellEditorServices/pull/1300) -
+  Address breaking changes in Omnisharp lib and depend on `DocumentUri` more.
+- 🚂✨ [PowerShellEditorServices #1291](https://github.com/PowerShell/PowerShellEditorServices/pull/1291) -
+  Depend on `DocumentUri` for handing vscode `Uri`'s.
+- 🧠✨ [vscode-powershell #2706](https://github.com/PowerShell/PowerShellEditorServices/pull/1294) -
+  Support `completionItem/resolve` request for comparison operators to show tooltip information.
+
 ## v2020.5.0-preview
 ### Wednesday, May 13, 2020
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)

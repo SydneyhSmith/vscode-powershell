@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
 #requires -Version 6.0
@@ -60,7 +60,7 @@ function NewReleaseVersionEntry
             }
             [ordered]@{
                 assetType = 'Microsoft.VisualStudio.Services.Icons.Default'
-                source = 'https://raw.githubusercontent.com/PowerShell/vscode-powershell/master/images/PowerShell_icon.png'
+                source = 'https://raw.githubusercontent.com/PowerShell/vscode-powershell/master/media/PowerShell_icon.png'
             }
             [ordered]@{
                 assetType = 'Microsoft.VisualStudio.Services.Content.Details'
@@ -104,7 +104,7 @@ function NewPowerShellExtensionEntry
         extensionId = '35'
         extensionName = 'powershell'
         displayName = 'PowerShell'
-        shortDescription = 'Develop PowerShell scripts in Azure Data Studio'
+        shortDescription = 'Develop PowerShell modules, commands and scripts in Azure Data Studio'
         publisher = [ordered]@{
             displayName = 'Microsoft'
             publisherId = 'Microsoft'

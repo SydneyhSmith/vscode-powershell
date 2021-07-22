@@ -1,12 +1,10 @@
-/*---------------------------------------------------------
- * Copyright (C) Microsoft Corporation. All rights reserved.
- *--------------------------------------------------------*/
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 
 import ChildProcess = require("child_process");
 import vscode = require("vscode");
-import { IFeature, LanguageClient } from "../feature";
 
-export class OpenInISEFeature implements IFeature {
+export class OpenInISEFeature implements vscode.Disposable {
     private command: vscode.Disposable;
 
     constructor() {
@@ -32,9 +30,5 @@ export class OpenInISEFeature implements IFeature {
 
     public dispose() {
         this.command.dispose();
-    }
-
-    public setLanguageClient(languageClient: LanguageClient) {
-        // Not needed for this feature.
     }
 }

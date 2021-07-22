@@ -1,22 +1,25 @@
 # PowerShell Language Support for Visual Studio Code
 
-[![Build Status](https://powershell.visualstudio.com/vscode-powershell/_apis/build/status/PowerShell.vscode-powershell?branchName=master)](https://powershell.visualstudio.com/vscode-powershell/_build/latest?definitionId=51&branchName=master)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/df06b9909e7442cebc1132bda0b8c0e3)](https://app.codacy.com/app/TylerLeonhardt/vscode-powershell?utm_source=github.com&utm_medium=referral&utm_content=PowerShell/vscode-powershell&utm_campaign=Badge_Grade_Dashboard)
-[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=PowerShell/vscode-powershell)](https://dependabot.com)
+[![Build Status](https://dev.azure.com/powershell/vscode-powershell/_apis/build/status/PowerShell.vscode-powershell?branchName=master)](https://dev.azure.com/powershell/vscode-powershell/_build/latest?definitionId=51&branchName=master)
 [![Version](https://vsmarketplacebadge.apphb.com/version/ms-vscode.PowerShell.svg)](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell)
 [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/ms-vscode.PowerShell.svg)](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell)
-[![Discord](https://img.shields.io/discord/180528040881815552.svg?label=%23vscode&logo=discord&logoColor=white)](https://aka.ms/psdiscord)
+[![Discord](https://img.shields.io/discord/180528040881815552.svg?label=%23vscode&logo=discord&logoColor=white)](https://aka.ms/powershell-vscode-discord)
 [![Join the chat at https://gitter.im/PowerShell/vscode-powershell](https://badges.gitter.im/PowerShell/vscode-powershell.svg)](https://gitter.im/PowerShell/vscode-powershell?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 This extension provides rich PowerShell language support for [Visual Studio Code](https://github.com/Microsoft/vscode).
 Now you can write and debug PowerShell scripts using the excellent IDE-like interface
-that Visual Studio Code provides. 
+that Visual Studio Code provides.
 
 This extension is powered by the PowerShell language server,
 [PowerShell Editor Services](https://github.com/PowerShell/PowerShellEditorServices).
 This leverages the
 [Language Server Protocol](https://microsoft.github.io/language-server-protocol/)
 where `PowerShellEditorServices` is the server and `vscode-powershell` is the client.
+
+Also included in this extension is the PowerShell ISE theme for Visual Studio Code. It is
+not activated by default, but after installing this extension either click "Set Color
+Theme" or use the [theme picker](https://code.visualstudio.com/docs/getstarted/themes) and
+select "PowerShell ISE" for a fun and familiar experience.
 
 ## Platform support
 
@@ -27,7 +30,7 @@ where `PowerShellEditorServices` is the server and `vscode-powershell` is the cl
 Read the [installation instructions](https://docs.microsoft.com/en-us/powershell/scripting/components/vscode/using-vscode)
 to get more details on how to use the extension on these platforms.
 
-Read the [FAQ](https://github.com/PowerShell/vscode-powershell/wiki/FAQ) for answers to common questions.
+Read the [troubleshooting guide](./docs/troubleshooting.md) for answers to common questions.
 
 ## Features
 
@@ -40,18 +43,20 @@ Read the [FAQ](https://github.com/PowerShell/vscode-powershell/wiki/FAQ) for ans
 - Document and workspace symbol discovery
 - Run selected selection of PowerShell code using <kbd>F8</kbd>
 - Launch online help for the symbol under the cursor using <kbd>Ctrl</kbd>+<kbd>F1</kbd>
-- Local script debugging and basic interactive console support!
+- Local script debugging
+- Integrated console support
+- PowerShell ISE color theme
 
 ## Installing the Extension
 
 You can install the official release of the PowerShell extension by following the steps
 in the [Visual Studio Code documentation](https://code.visualstudio.com/docs/editor/extension-gallery).
-In the Extensions pane, search for "PowerShell" extension and install it there.  You will
+In the Extensions pane, search for "PowerShell" extension and install it there. You will
 get notified automatically about any future extension updates!
 
 You can also install a VSIX package from our [Releases page](https://github.com/PowerShell/vscode-powershell/releases) by following the
 [Install from a VSIX](https://code.visualstudio.com/docs/editor/extension-gallery#_install-from-a-vsix)
-instructions.  The easiest way is through the command line:
+instructions. The easiest way is through the command line:
 
 ```powershell
 code --install-extension PowerShell-<version>.vsix
@@ -87,7 +92,8 @@ If you experience any problems with the PowerShell Extension, see
 [the troubleshooting docs](./docs/troubleshooting.md) for information
 on diagnosing and reporting issues.
 
-#### Security Note
+### Security Note
+
 For any security issues, please see [here](./docs/troubleshooting.md#note-on-security).
 
 ## Example Scripts
@@ -122,9 +128,8 @@ on how to contribute to this extension!
 
 ## Maintainers
 
-- [Keith Hill](https://github.com/rkeithhill) - [@r_keith_hill](http://twitter.com/r_keith_hill)
-- [Tyler Leonhardt](https://github.com/tylerl0706) - [@TylerLeonhardt](http://twitter.com/tylerleonhardt)
-- [Rob Holt](https://github.com/rjmholt)
+- [Rob Holt](https://github.com/rjmholt) - [@rjmholt](https://twitter.com/rjmholt)
+- [Andy Schwartzmeyer](https://github.com/andschwa) - [andschwa.com](https://andschwa.com/)
 
 ## License
 

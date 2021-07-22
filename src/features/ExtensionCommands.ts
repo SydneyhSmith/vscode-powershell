@@ -1,16 +1,16 @@
-/*---------------------------------------------------------
- * Copyright (C) Microsoft Corporation. All rights reserved.
- *--------------------------------------------------------*/
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
-import { LanguageClient, NotificationType, NotificationType0,
+import { NotificationType, NotificationType0,
     Position, Range, RequestType } from "vscode-languageclient";
-import { IFeature } from "../feature";
+import { LanguageClient } from "vscode-languageclient/node";
 import { Logger } from "../logging";
 import Settings = require("../settings");
+import { LanguageClientConsumer } from "../languageClientConsumer";
 
 export interface IExtensionCommand {
     name: string;
@@ -22,7 +22,7 @@ export interface IExtensionCommandQuickPickItem extends vscode.QuickPickItem {
 }
 
 export const InvokeExtensionCommandRequestType =
-    new RequestType<IInvokeExtensionCommandRequestArguments, void, void, void>(
+    new RequestType<IInvokeExtensionCommandRequestArguments, void, void>(
         "powerShell/invokeExtensionCommand");
 
 export interface IEditorContext {
@@ -39,7 +39,7 @@ export interface IInvokeExtensionCommandRequestArguments {
 }
 
 export const ExtensionCommandAddedNotificationType =
-    new NotificationType<IExtensionCommandAddedNotificationBody, void>(
+    new NotificationType<IExtensionCommandAddedNotificationBody>(
         "powerShell/extensionCommandAdded");
 
 export interface IExtensionCommandAddedNotificationBody {
@@ -90,7 +90,7 @@ function asCodePosition(value: Position): vscode.Position {
 }
 
 export const GetEditorContextRequestType =
-    new RequestType<IGetEditorContextRequestArguments, IEditorContext, void, void>(
+    new RequestType<IGetEditorContextRequestArguments, IEditorContext, void>(
         "editor/getEditorContext");
 
 // tslint:disable-next-line:no-empty-interface
@@ -103,7 +103,7 @@ enum EditorOperationResponse {
 }
 
 export const InsertTextRequestType =
-    new RequestType<IInsertTextRequestArguments, EditorOperationResponse, void, void>(
+    new RequestType<IInsertTextRequestArguments, EditorOperationResponse, void>(
         "editor/insertText");
 
 export interface IInsertTextRequestArguments {
@@ -113,7 +113,7 @@ export interface IInsertTextRequestArguments {
 }
 
 export const SetSelectionRequestType =
-    new RequestType<ISetSelectionRequestArguments, EditorOperationResponse, void, void>(
+    new RequestType<ISetSelectionRequestArguments, EditorOperationResponse, void>(
         "editor/setSelection");
 
 export interface ISetSelectionRequestArguments {
@@ -121,7 +121,7 @@ export interface ISetSelectionRequestArguments {
 }
 
 export const OpenFileRequestType =
-    new RequestType<IOpenFileDetails, EditorOperationResponse, void, void>(
+    new RequestType<IOpenFileDetails, EditorOperationResponse, void>(
         "editor/openFile");
 
 export interface IOpenFileDetails {
@@ -130,31 +130,31 @@ export interface IOpenFileDetails {
 }
 
 export const NewFileRequestType =
-    new RequestType<string, EditorOperationResponse, void, void>(
+    new RequestType<string, EditorOperationResponse, void>(
         "editor/newFile");
 
 export const CloseFileRequestType =
-    new RequestType<string, EditorOperationResponse, void, void>(
+    new RequestType<string, EditorOperationResponse, void>(
         "editor/closeFile");
 
 export const SaveFileRequestType =
-    new RequestType<ISaveFileDetails, EditorOperationResponse, void, void>(
+    new RequestType<ISaveFileDetails, EditorOperationResponse, void>(
         "editor/saveFile");
 
 export const ShowErrorMessageRequestType =
-    new RequestType<string, EditorOperationResponse, void, void>(
+    new RequestType<string, EditorOperationResponse, void>(
         "editor/showErrorMessage");
 
 export const ShowWarningMessageRequestType =
-    new RequestType<string, EditorOperationResponse, void, void>(
+    new RequestType<string, EditorOperationResponse, void>(
         "editor/showWarningMessage");
 
 export const ShowInformationMessageRequestType =
-    new RequestType<string, EditorOperationResponse, void, void>(
+    new RequestType<string, EditorOperationResponse, void>(
         "editor/showInformationMessage");
 
 export const SetStatusBarMessageRequestType =
-    new RequestType<IStatusBarMessageDetails, EditorOperationResponse, void, void>(
+    new RequestType<IStatusBarMessageDetails, EditorOperationResponse, void>(
         "editor/setStatusBarMessage");
 
 export const ClearTerminalNotificationType =
@@ -173,20 +173,20 @@ interface IInvokeRegisteredEditorCommandParameter {
     commandName: string;
 }
 
-export class ExtensionCommandsFeature implements IFeature {
+export class ExtensionCommandsFeature extends LanguageClientConsumer {
 
     private command: vscode.Disposable;
     private command2: vscode.Disposable;
-    private languageClient: LanguageClient;
+    private command3: vscode.Disposable;
+    private command4: vscode.Disposable;
+    private command5: vscode.Disposable;
+    private command6: vscode.Disposable;
+    // TODO: Make a list of commands instead.
     private extensionCommands: IExtensionCommand[] = [];
 
     constructor(private log: Logger) {
+        super();
         this.command = vscode.commands.registerCommand("PowerShell.ShowAdditionalCommands", () => {
-            if (this.languageClient === undefined) {
-                this.log.writeAndShowError(`<${ExtensionCommandsFeature.name}>: ` +
-                    "Unable to instantiate; language client undefined.");
-                return;
-            }
 
             const editor = vscode.window.activeTextEditor;
             let start = editor.selection.start;
@@ -214,6 +214,17 @@ export class ExtensionCommandsFeature implements IFeature {
             }
         });
 
+        this.command3 = vscode.commands.registerCommand('PowerShell.ClosePanel',
+            async () => { await vscode.commands.executeCommand('workbench.action.closePanel'); }),
+
+        this.command4 = vscode.commands.registerCommand('PowerShell.PositionPanelLeft',
+            async () => { await vscode.commands.executeCommand('workbench.action.positionPanelLeft'); }),
+
+        this.command5 = vscode.commands.registerCommand('PowerShell.PositionPanelBottom',
+            async () => { await vscode.commands.executeCommand('workbench.action.positionPanelBottom'); }),
+
+        this.command6 = vscode.commands.registerCommand('PowerShell.Debug.Start',
+            async () => { await vscode.commands.executeCommand('workbench.action.debug.start'); })
     }
 
     public setLanguageClient(languageclient: LanguageClient) {
@@ -286,6 +297,10 @@ export class ExtensionCommandsFeature implements IFeature {
     public dispose() {
         this.command.dispose();
         this.command2.dispose();
+        this.command3.dispose();
+        this.command4.dispose();
+        this.command5.dispose();
+        this.command6.dispose();
     }
 
     private addExtensionCommand(command: IExtensionCommandAddedNotificationBody) {

@@ -1,6 +1,5 @@
-/*---------------------------------------------------------
- * Copyright (C) Microsoft Corporation. All rights reserved.
- *--------------------------------------------------------*/
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 
 "use strict";
 
@@ -8,17 +7,14 @@ import path = require("path");
 import vscode = require("vscode");
 import TelemetryReporter from "vscode-extension-telemetry";
 import { DocumentSelector } from "vscode-languageclient";
-import { IFeature } from "./feature";
 import { CodeActionsFeature } from "./features/CodeActions";
 import { ConsoleFeature } from "./features/Console";
 import { CustomViewsFeature } from "./features/CustomViews";
 import { DebugSessionFeature } from "./features/DebugSession";
-import { PickPSHostProcessFeature } from "./features/DebugSession";
-import { PickRunspaceFeature } from "./features/DebugSession";
-import { SpecifyScriptArgsFeature } from "./features/DebugSession";
 import { ExamplesFeature } from "./features/Examples";
 import { ExpandAliasFeature } from "./features/ExpandAlias";
 import { ExtensionCommandsFeature } from "./features/ExtensionCommands";
+import { ExternalApiFeature, IPowerShellExtensionClient } from "./features/ExternalApi";
 import { FindModuleFeature } from "./features/FindModule";
 import { GenerateBugReportFeature } from "./features/GenerateBugReport";
 import { GetCommandsFeature } from "./features/GetCommands";
@@ -27,14 +23,16 @@ import { ISECompatibilityFeature } from "./features/ISECompatibility";
 import { NewFileOrProjectFeature } from "./features/NewFileOrProject";
 import { OpenInISEFeature } from "./features/OpenInISE";
 import { PesterTestsFeature } from "./features/PesterTests";
+import { PickPSHostProcessFeature, PickRunspaceFeature } from "./features/DebugSession";
 import { RemoteFilesFeature } from "./features/RemoteFiles";
 import { RunCodeFeature } from "./features/RunCode";
 import { ShowHelpFeature } from "./features/ShowHelp";
+import { SpecifyScriptArgsFeature } from "./features/DebugSession";
 import { Logger, LogLevel } from "./logging";
 import { SessionManager } from "./session";
 import Settings = require("./settings");
 import { PowerShellLanguageId } from "./utils";
-import utils = require("./utils");
+import { LanguageClientConsumer } from "./languageClientConsumer";
 
 // The most reliable way to get the name and version of the current extension.
 // tslint:disable-next-line: no-var-requires
@@ -45,7 +43,8 @@ const AI_KEY: string = "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217";
 
 let logger: Logger;
 let sessionManager: SessionManager;
-let extensionFeatures: IFeature[] = [];
+let languageClientConsumers: LanguageClientConsumer[] = [];
+let commandRegistrations: vscode.Disposable[] = [];
 let telemetryReporter: TelemetryReporter;
 
 const documentSelector: DocumentSelector = [
@@ -53,7 +52,7 @@ const documentSelector: DocumentSelector = [
     { language: "powershell", scheme: "untitled" },
 ];
 
-export function activate(context: vscode.ExtensionContext): void {
+export function activate(context: vscode.ExtensionContext): IPowerShellExtensionClient {
     // create telemetry reporter on extension activation
     telemetryReporter = new TelemetryReporter(PackageJSON.name, PackageJSON.version, AI_KEY);
 
@@ -134,36 +133,49 @@ export function activate(context: vscode.ExtensionContext): void {
             PackageJSON.version,
             telemetryReporter);
 
-    // Create features
-    extensionFeatures = [
-        new ConsoleFeature(logger),
+    // Register commands that do not require Language client
+    commandRegistrations = [
         new ExamplesFeature(),
-        new OpenInISEFeature(),
         new GenerateBugReportFeature(sessionManager),
-        new ExpandAliasFeature(logger),
-        new GetCommandsFeature(logger),
         new ISECompatibilityFeature(),
-        new ShowHelpFeature(logger),
-        new FindModuleFeature(),
+        new OpenInISEFeature(),
         new PesterTestsFeature(sessionManager),
         new RunCodeFeature(sessionManager),
-        new ExtensionCommandsFeature(logger),
         new CodeActionsFeature(logger),
+        new SpecifyScriptArgsFeature(context),
+    ]
+
+    const externalApi = new ExternalApiFeature(sessionManager, logger);
+
+    // Features and command registrations that require language client
+    languageClientConsumers = [
+        new ConsoleFeature(logger),
+        new ExpandAliasFeature(logger),
+        new GetCommandsFeature(logger),
+        new ShowHelpFeature(logger),
+        new FindModuleFeature(),
+        new ExtensionCommandsFeature(logger),
         new NewFileOrProjectFeature(),
         new RemoteFilesFeature(),
         new DebugSessionFeature(context, sessionManager, logger),
         new PickPSHostProcessFeature(),
-        new SpecifyScriptArgsFeature(context),
         new HelpCompletionFeature(logger),
         new CustomViewsFeature(),
         new PickRunspaceFeature(),
+        externalApi
     ];
 
-    sessionManager.setExtensionFeatures(extensionFeatures);
+    sessionManager.setLanguageClientConsumers(languageClientConsumers);
 
     if (extensionSettings.startAutomatically) {
         sessionManager.start();
     }
+
+    return {
+        registerExternalExtension: (id: string, apiVersion: string = 'v1') => externalApi.registerExternalExtension(id, apiVersion),
+        unregisterExternalExtension: uuid => externalApi.unregisterExternalExtension(uuid),
+        getPowerShellVersionDetails: uuid => externalApi.getPowerShellVersionDetails(uuid),
+    };
 }
 
 function checkForUpdatedVersion(context: vscode.ExtensionContext, version: string) {
@@ -197,8 +209,12 @@ function checkForUpdatedVersion(context: vscode.ExtensionContext, version: strin
 
 export function deactivate(): void {
     // Clean up all extension features
-    extensionFeatures.forEach((feature) => {
-       feature.dispose();
+    languageClientConsumers.forEach((languageClientConsumer) => {
+        languageClientConsumer.dispose();
+    });
+
+    commandRegistrations.forEach((commandRegistration) => {
+        commandRegistration.dispose();
     });
 
     // Dispose of the current session

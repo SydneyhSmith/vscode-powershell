@@ -1,26 +1,26 @@
-/*---------------------------------------------------------
- * Copyright (C) Microsoft Corporation. All rights reserved.
- *--------------------------------------------------------*/
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 
 import vscode = require("vscode");
-import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
+import { NotificationType, RequestType } from "vscode-languageclient";
+import { LanguageClient } from "vscode-languageclient/node";
 import { ICheckboxQuickPickItem, showCheckboxQuickPick } from "../controls/checkboxQuickPick";
-import { IFeature } from "../feature";
 import { Logger } from "../logging";
 import Settings = require("../settings");
+import { LanguageClientConsumer } from "../languageClientConsumer";
 
-export const EvaluateRequestType = new RequestType<IEvaluateRequestArguments, void, void, void>("evaluate");
-export const OutputNotificationType = new NotificationType<IOutputNotificationBody, void>("output");
+export const EvaluateRequestType = new RequestType<IEvaluateRequestArguments, void, void>("evaluate");
+export const OutputNotificationType = new NotificationType<IOutputNotificationBody>("output");
 export const ExecutionStatusChangedNotificationType =
-    new NotificationType<IExecutionStatusDetails, void>("powerShell/executionStatusChanged");
+    new NotificationType<IExecutionStatusDetails>("powerShell/executionStatusChanged");
 
 export const ShowChoicePromptRequestType =
     new RequestType<IShowChoicePromptRequestArgs,
-                    IShowChoicePromptResponseBody, string, void>("powerShell/showChoicePrompt");
+                    IShowChoicePromptResponseBody, string>("powerShell/showChoicePrompt");
 
 export const ShowInputPromptRequestType =
     new RequestType<IShowInputPromptRequestArgs,
-                    IShowInputPromptResponseBody, string, void>("powerShell/showInputPrompt");
+                    IShowInputPromptResponseBody, string>("powerShell/showInputPrompt");
 
 export interface IEvaluateRequestArguments {
     expression: string;
@@ -197,19 +197,14 @@ function onInputEntered(responseText: string): IShowInputPromptResponseBody {
     }
 }
 
-export class ConsoleFeature implements IFeature {
+export class ConsoleFeature extends LanguageClientConsumer {
     private commands: vscode.Disposable[];
-    private languageClient: LanguageClient;
     private resolveStatusBarPromise: (value?: {} | PromiseLike<{}>) => void;
 
     constructor(private log: Logger) {
+        super();
         this.commands = [
             vscode.commands.registerCommand("PowerShell.RunSelection", async () => {
-                if (this.languageClient === undefined) {
-                    this.log.writeAndShowError(`<${ConsoleFeature.name}>: ` +
-                        "Unable to instantiate; language client undefined.");
-                    return;
-                }
 
                 if (vscode.window.activeTerminal &&
                     vscode.window.activeTerminal.name !== "PowerShell Integrated Console") {
@@ -257,7 +252,6 @@ export class ConsoleFeature implements IFeature {
 
     public setLanguageClient(languageClient: LanguageClient) {
         this.languageClient = languageClient;
-
         this.languageClient.onRequest(
             ShowChoicePromptRequestType,
             (promptDetails) => showChoicePrompt(promptDetails, this.languageClient));

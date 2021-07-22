@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
 #requires -Version 6.0
@@ -549,6 +549,7 @@ function New-GitHubPR
         body = $Description
         head = $Branch
         base = $TargetBranch
+        draft = $true
         maintainer_can_modify = $true
     } | ConvertTo-Json
 

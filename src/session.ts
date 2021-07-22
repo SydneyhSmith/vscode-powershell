@@ -1,6 +1,5 @@
-/*---------------------------------------------------------
- * Copyright (C) Microsoft Corporation. All rights reserved.
- *--------------------------------------------------------*/
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 
 import fs = require("fs");
 import net = require("net");
@@ -9,21 +8,22 @@ import * as semver from "semver";
 import vscode = require("vscode");
 import TelemetryReporter from "vscode-extension-telemetry";
 import { Message } from "vscode-jsonrpc";
-import { IFeature } from "./feature";
 import { Logger } from "./logging";
 import { PowerShellProcess } from "./process";
 import Settings = require("./settings");
 import utils = require("./utils");
 
 import {
-    CloseAction, DocumentSelector, ErrorAction, LanguageClient, LanguageClientOptions,
+    CloseAction, DocumentSelector, ErrorAction, LanguageClientOptions,
     Middleware, NotificationType, RequestType0,
-    ResolveCodeLensSignature, RevealOutputChannelOn, StreamInfo } from "vscode-languageclient";
+    ResolveCodeLensSignature, RevealOutputChannelOn } from "vscode-languageclient";
+import { LanguageClient, StreamInfo } from "vscode-languageclient/node";
 
 import { GitHubReleaseInformation, InvokePowerShellUpdateCheck } from "./features/UpdatePowerShell";
 import {
     getPlatformDetails, IPlatformDetails, IPowerShellExeDetails,
     OperatingSystem, PowerShellExeFinder } from "./platform";
+import { LanguageClientConsumer } from "./languageClientConsumer";
 
 export enum SessionStatus {
     NeverStarted,
@@ -44,7 +44,7 @@ export class SessionManager implements Middleware {
     private suppressRestartPrompt: boolean;
     private focusConsoleOnExecute: boolean;
     private platformDetails: IPlatformDetails;
-    private extensionFeatures: IFeature[] = [];
+    private languageClientConsumers: LanguageClientConsumer[] = [];
     private statusBarItem: vscode.StatusBarItem;
     private languageServerProcess: PowerShellProcess;
     private debugSessionProcess: PowerShellProcess;
@@ -54,6 +54,7 @@ export class SessionManager implements Middleware {
     private sessionSettings: Settings.ISettings = undefined;
     private sessionDetails: utils.IEditorServicesSessionDetails;
     private bundledModulesPath: string;
+    private started: boolean = false;
 
     // Initialized by the start() method, since this requires settings
     private powershellExeFinder: PowerShellExeFinder;
@@ -61,7 +62,7 @@ export class SessionManager implements Middleware {
     // When in development mode, VS Code's session ID is a fake
     // value of "someValue.machineId".  Use that to detect dev
     // mode for now until Microsoft/vscode#10272 gets implemented.
-    private readonly inDevelopmentMode =
+    public readonly InDevelopmentMode =
         vscode.env.sessionId === "someValue.sessionId";
 
     constructor(
@@ -100,8 +101,8 @@ export class SessionManager implements Middleware {
         this.registeredCommands.forEach((command) => { command.dispose(); });
     }
 
-    public setExtensionFeatures(extensionFeatures: IFeature[]) {
-        this.extensionFeatures = extensionFeatures;
+    public setLanguageClientConsumers(languageClientConsumers: LanguageClientConsumer[]) {
+        this.languageClientConsumers = languageClientConsumers;
     }
 
     public start(exeNameOverride?: string) {
@@ -167,7 +168,7 @@ export class SessionManager implements Middleware {
 
         this.bundledModulesPath = path.resolve(__dirname, this.sessionSettings.bundledModulesPath);
 
-        if (this.inDevelopmentMode) {
+        if (this.InDevelopmentMode) {
             const devBundledModulesPath =
                 path.resolve(
                     __dirname,
@@ -196,7 +197,7 @@ export class SessionManager implements Middleware {
         } else {
             const startupBanner = `=====> ${this.HostName} Integrated Console v${this.HostVersion} <=====
 `;
-            this.editorServicesArgs += `-StartupBanner "${startupBanner}" `;
+            this.editorServicesArgs += `-StartupBanner '${startupBanner}' `;
         }
 
         if (this.sessionSettings.developer.editorServicesWaitForDebugger) {
@@ -274,6 +275,12 @@ export class SessionManager implements Middleware {
         return this.debugSessionProcess;
     }
 
+    public async waitUntilStarted(): Promise<void> {
+        while(!this.started) {
+            await utils.sleep(300);
+        }
+    }
+
     // ----- LanguageClient middleware methods -----
 
     public resolveCodeLens(
@@ -283,7 +290,7 @@ export class SessionManager implements Middleware {
             const resolvedCodeLens = next(codeLens, token);
             const resolveFunc =
                 (codeLensToFix: vscode.CodeLens): vscode.CodeLens => {
-                    if (codeLensToFix.command.command === "editor.action.showReferences") {
+                    if (codeLensToFix.command?.command === "editor.action.showReferences") {
                         const oldArgs = codeLensToFix.command.arguments;
 
                         // Our JSON objects don't get handled correctly by
@@ -319,17 +326,17 @@ export class SessionManager implements Middleware {
             return resolvedCodeLens;
     }
 
-    // During preview, populate a new setting value but not remove the old value.
-    // TODO: When the next stable extension releases, then the old value can be safely removed. Tracked in this issue: https://github.com/PowerShell/vscode-powershell/issues/2693
+    // Move old setting codeFormatting.whitespaceAroundPipe to new setting codeFormatting.addWhitespaceAroundPipe
     private async migrateWhitespaceAroundPipeSetting() {
         const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
         const deprecatedSetting = 'codeFormatting.whitespaceAroundPipe'
         const newSetting = 'codeFormatting.addWhitespaceAroundPipe'
         const configurationTargetOfNewSetting = await Settings.getEffectiveConfigurationTarget(newSetting);
-        if (configuration.has(deprecatedSetting) && configurationTargetOfNewSetting === null) {
-            const configurationTarget = await Settings.getEffectiveConfigurationTarget(deprecatedSetting);
-            const value = configuration.get(deprecatedSetting, configurationTarget)
-            await Settings.change(newSetting, value, configurationTarget);
+        const configurationTargetOfOldSetting = await Settings.getEffectiveConfigurationTarget(deprecatedSetting);
+        if (configurationTargetOfOldSetting !== null && configurationTargetOfNewSetting === null) {
+            const value = configuration.get(deprecatedSetting, configurationTargetOfOldSetting)
+            await Settings.change(newSetting, value, configurationTargetOfOldSetting);
+            await Settings.change(deprecatedSetting, undefined, configurationTargetOfOldSetting);
         }
     }
 
@@ -542,6 +549,17 @@ export class SessionManager implements Middleware {
                     connectFunc,
                     clientOptions);
 
+            // This enables handling Semantic Highlighting messages in PowerShell Editor Services
+            this.languageServerClient.registerProposedFeatures();
+
+            if (!this.InDevelopmentMode) {
+                this.languageServerClient.onTelemetry((event) => {
+                    const eventName: string = event.eventName ? event.eventName : "PSESEvent";
+                    const data: any = event.data ? event.data : event
+                    this.telemetryReporter.sendTelemetryEvent(eventName, data);
+                });
+            }
+
             this.languageServerClient.onReady().then(
                 () => {
                     this.languageServerClient
@@ -549,8 +567,9 @@ export class SessionManager implements Middleware {
                         .then(
                             async (versionDetails) => {
                                 this.versionDetails = versionDetails;
+                                this.started = true;
 
-                                if (!this.inDevelopmentMode) {
+                                if (!this.InDevelopmentMode) {
                                     this.telemetryReporter.sendTelemetryEvent("powershellVersionCheck",
                                         { powershellVersion: versionDetails.version });
                                 }
@@ -591,7 +610,7 @@ export class SessionManager implements Middleware {
                     // Send the new LanguageClient to extension features
                     // so that they can register their message handlers
                     // before the connection is established.
-                    this.updateExtensionFeatures(this.languageServerClient);
+                    this.updateLanguageClientConsumers(this.languageServerClient);
                     this.languageServerClient.onNotification(
                         RunspaceChangedEventType,
                         (runspaceDetails) => { this.setStatusBarVersionString(runspaceDetails); });
@@ -606,8 +625,8 @@ export class SessionManager implements Middleware {
         }
     }
 
-    private updateExtensionFeatures(languageClient: LanguageClient) {
-        this.extensionFeatures.forEach((feature) => {
+    private updateLanguageClientConsumers(languageClient: LanguageClient) {
+        this.languageClientConsumers.forEach((feature) => {
             feature.setLanguageClient(languageClient);
         });
     }
@@ -637,7 +656,9 @@ export class SessionManager implements Middleware {
 
     private setSessionStatus(statusText: string, status: SessionStatus): void {
         // Set color and icon for 'Running' by default
-        let statusIconText = "$(terminal) ";
+        let statusIconText = (semver.gte(vscode.version, "1.56.0"))
+            ? "$(terminal-powershell) "
+            : "$(terminal) ";
         let statusColor = "#affc74";
 
         if (status === SessionStatus.Initializing) {
@@ -691,7 +712,7 @@ export class SessionManager implements Middleware {
             case SessionStatus.Stopping:
                 const currentPowerShellExe =
                 availablePowerShellExes
-                    .find((item) => item.displayName.toLowerCase() === this.PowerShellExeDetails.displayName);
+                    .find((item) => item.displayName.toLowerCase() === this.PowerShellExeDetails.displayName.toLowerCase());
 
                 const powerShellSessionName =
                     currentPowerShellExe ?
@@ -763,11 +784,11 @@ class SessionMenuItem implements vscode.QuickPickItem {
 }
 
 export const PowerShellVersionRequestType =
-    new RequestType0<IPowerShellVersionDetails, void, void>(
+    new RequestType0<IPowerShellVersionDetails, void>(
         "powerShell/getVersion");
 
 export const RunspaceChangedEventType =
-    new NotificationType<IRunspaceDetails, void>(
+    new NotificationType<IRunspaceDetails>(
         "powerShell/runspaceChanged");
 
 export enum RunspaceType {

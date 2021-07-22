@@ -1,12 +1,11 @@
-/*---------------------------------------------------------
- * Copyright (C) Microsoft Corporation. All rights reserved.
- *--------------------------------------------------------*/
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 
 import vscode = require("vscode");
 import { CancellationToken, DebugConfiguration, DebugConfigurationProvider,
     ExtensionContext, WorkspaceFolder } from "vscode";
-import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
-import { IFeature } from "../feature";
+import { NotificationType, RequestType } from "vscode-languageclient";
+import { LanguageClient } from "vscode-languageclient/node";
 import { getPlatformDetails, OperatingSystem } from "../platform";
 import { PowerShellProcess} from "../process";
 import { SessionManager, SessionStatus } from "../session";
@@ -14,11 +13,13 @@ import Settings = require("../settings");
 import utils = require("../utils");
 import { NamedPipeDebugAdapter } from "../debugAdapter";
 import { Logger } from "../logging";
+import { LanguageClientConsumer } from "../languageClientConsumer";
 
 export const StartDebuggerNotificationType =
-    new NotificationType<void, void>("powerShell/startDebugger");
+    new NotificationType<void>("powerShell/startDebugger");
 
-export class DebugSessionFeature implements IFeature, DebugConfigurationProvider, vscode.DebugAdapterDescriptorFactory {
+export class DebugSessionFeature extends LanguageClientConsumer
+    implements DebugConfigurationProvider, vscode.DebugAdapterDescriptorFactory {
 
     private sessionCount: number = 1;
     private command: vscode.Disposable;
@@ -26,6 +27,7 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
     private tempSessionDetails: utils.IEditorServicesSessionDetails;
 
     constructor(context: ExtensionContext, private sessionManager: SessionManager, private logger: Logger) {
+        super();
         // Register a debug configuration provider
         context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider("PowerShell", this));
         context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory("PowerShell", this))
@@ -325,10 +327,9 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
     }
 }
 
-export class SpecifyScriptArgsFeature implements IFeature {
+export class SpecifyScriptArgsFeature implements vscode.Disposable {
 
     private command: vscode.Disposable;
-    private languageClient: LanguageClient;
     private context: vscode.ExtensionContext;
 
     constructor(context: vscode.ExtensionContext) {
@@ -338,10 +339,6 @@ export class SpecifyScriptArgsFeature implements IFeature {
             vscode.commands.registerCommand("PowerShell.SpecifyScriptArgs", () => {
                 return this.specifyScriptArguments();
             });
-    }
-
-    public setLanguageClient(languageclient: LanguageClient) {
-        this.languageClient = languageclient;
     }
 
     public dispose() {
@@ -374,7 +371,7 @@ export class SpecifyScriptArgsFeature implements IFeature {
 }
 
 interface IProcessItem extends vscode.QuickPickItem {
-    pid: string;	// payload for the QuickPick UI
+    pid: string;    // payload for the QuickPick UI
 }
 
 interface IPSHostProcessInfo {
@@ -385,20 +382,20 @@ interface IPSHostProcessInfo {
 }
 
 export const GetPSHostProcessesRequestType =
-    new RequestType<any, IGetPSHostProcessesResponseBody, string, void>("powerShell/getPSHostProcesses");
+    new RequestType<any, IGetPSHostProcessesResponseBody, string>("powerShell/getPSHostProcesses");
 
 interface IGetPSHostProcessesResponseBody {
     hostProcesses: IPSHostProcessInfo[];
 }
 
-export class PickPSHostProcessFeature implements IFeature {
+export class PickPSHostProcessFeature extends LanguageClientConsumer {
 
     private command: vscode.Disposable;
-    private languageClient: LanguageClient;
     private waitingForClientToken: vscode.CancellationTokenSource;
     private getLanguageClientResolve: (value?: LanguageClient | Thenable<LanguageClient>) => void;
 
     constructor() {
+        super();
 
         this.command =
             vscode.commands.registerCommand("PowerShell.PickPSHostProcess", () => {
@@ -460,7 +457,7 @@ export class PickPSHostProcessFeature implements IFeature {
     }
 
     private pickPSHostProcess(): Thenable<string> {
-        return this.languageClient.sendRequest(GetPSHostProcessesRequestType, null).then((hostProcesses) => {
+        return this.languageClient.sendRequest(GetPSHostProcessesRequestType, {}).then((hostProcesses) => {
             // Start with the current PowerShell process in the list.
             const items: IProcessItem[] = [{
                 label: "Current",
@@ -510,7 +507,7 @@ export class PickPSHostProcessFeature implements IFeature {
 }
 
 interface IRunspaceItem extends vscode.QuickPickItem {
-    id: string;	// payload for the QuickPick UI
+    id: string;    // payload for the QuickPick UI
 }
 
 interface IRunspace {
@@ -520,16 +517,16 @@ interface IRunspace {
 }
 
 export const GetRunspaceRequestType =
-    new RequestType<any, IRunspace[], string, void>("powerShell/getRunspace");
+    new RequestType<any, IRunspace[], string>("powerShell/getRunspace");
 
-export class PickRunspaceFeature implements IFeature {
+export class PickRunspaceFeature extends LanguageClientConsumer {
 
     private command: vscode.Disposable;
-    private languageClient: LanguageClient;
     private waitingForClientToken: vscode.CancellationTokenSource;
     private getLanguageClientResolve: (value?: LanguageClient | Thenable<LanguageClient>) => void;
 
     constructor() {
+        super();
         this.command =
             vscode.commands.registerCommand("PowerShell.PickRunspace", (processId) => {
                 return this.getLanguageClient()

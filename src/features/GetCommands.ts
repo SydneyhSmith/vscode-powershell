@@ -1,10 +1,11 @@
-/*---------------------------------------------------------
- * Copyright (C) Microsoft Corporation. All rights reserved.
- *--------------------------------------------------------*/
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 import * as vscode from "vscode";
-import { LanguageClient, RequestType0 } from "vscode-languageclient";
-import { IFeature } from "../feature";
+import { RequestType0 } from "vscode-languageclient";
+import { LanguageClient } from "vscode-languageclient/node";
 import { Logger } from "../logging";
+import { LanguageClientConsumer } from "../languageClientConsumer";
 
 interface ICommand {
     name: string;
@@ -18,18 +19,18 @@ interface ICommand {
  * RequestType sent over to PSES.
  * Expects: ICommand to be returned
  */
-export const GetCommandRequestType = new RequestType0<ICommand[], void, void>("powerShell/getCommand");
+export const GetCommandRequestType = new RequestType0<ICommand[], void>("powerShell/getCommand");
 
 /**
  * A PowerShell Command listing feature. Implements a treeview control.
  */
-export class GetCommandsFeature implements IFeature {
+export class GetCommandsFeature extends LanguageClientConsumer {
     private command: vscode.Disposable;
-    private languageClient: LanguageClient;
     private commandsExplorerProvider: CommandsExplorerProvider;
     private commandsExplorerTreeView: vscode.TreeView<Command>;
 
     constructor(private log: Logger) {
+        super();
         this.command = vscode.commands.registerCommand("PowerShell.RefreshCommandsExplorer",
             () => this.CommandExplorerRefresh());
         this.commandsExplorerProvider = new CommandsExplorerProvider();
@@ -93,7 +94,7 @@ class CommandsExplorerProvider implements vscode.TreeDataProvider<Command> {
     }
 
     public refresh(): void {
-        this.didChangeTreeData.fire();
+        this.didChangeTreeData.fire(undefined);
     }
 
     public getTreeItem(element: Command): vscode.TreeItem {

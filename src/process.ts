@@ -1,6 +1,5 @@
-/*---------------------------------------------------------
- * Copyright (C) Microsoft Corporation. All rights reserved.
- *--------------------------------------------------------*/
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 
 import cp = require("child_process");
 import fs = require("fs");
@@ -112,6 +111,7 @@ export class PowerShellProcess {
                 shellPath: this.exePath,
                 shellArgs: powerShellArgs,
                 hideFromUser: !this.sessionSettings.integratedConsole.showOnStartup,
+                cwd: this.sessionSettings.cwd
             });
 
         const pwshName = path.basename(this.exePath);
@@ -178,10 +178,6 @@ export class PowerShellProcess {
         return true;
     }
 
-    private sleep(ms: number) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
     private async waitForSessionFile(): Promise<utils.IEditorServicesSessionDetails> {
         // Determine how many tries by dividing by 2000 thus checking every 2 seconds.
         const numOfTries = this.sessionSettings.developer.waitForSessionFileTimeoutSeconds / 2;
@@ -202,7 +198,7 @@ export class PowerShellProcess {
             }
 
             // Wait a bit and try again
-            await this.sleep(2000);
+            await utils.sleep(2000);
         }
 
         const err = "Timed out waiting for session file to appear.";

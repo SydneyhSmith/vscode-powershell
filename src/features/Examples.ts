@@ -1,13 +1,10 @@
-/*---------------------------------------------------------
- * Copyright (C) Microsoft Corporation. All rights reserved.
- *--------------------------------------------------------*/
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 
 import path = require("path");
 import vscode = require("vscode");
-import { LanguageClient } from "vscode-languageclient";
-import { IFeature } from "../feature";
 
-export class ExamplesFeature implements IFeature {
+export class ExamplesFeature implements vscode.Disposable {
     private command: vscode.Disposable;
     private examplesPath: string;
 
@@ -19,10 +16,6 @@ export class ExamplesFeature implements IFeature {
                 vscode.Uri.file(this.examplesPath),
                 true);
         });
-    }
-
-    public setLanguageClient(languageclient: LanguageClient) {
-        // Eliminate tslint warning
     }
 
     public dispose() {

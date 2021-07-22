@@ -1,19 +1,19 @@
-/*---------------------------------------------------------
- * Copyright (C) Microsoft Corporation. All rights reserved.
- *--------------------------------------------------------*/
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 
 import vscode = require("vscode");
-import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
-import { IFeature } from "../feature";
+import { RequestType } from "vscode-languageclient";
+import { LanguageClient } from "vscode-languageclient/node";
+import { LanguageClientConsumer } from "../languageClientConsumer";
 
-export class NewFileOrProjectFeature implements IFeature {
+export class NewFileOrProjectFeature extends LanguageClientConsumer {
 
     private readonly loadIcon = "  $(sync)  ";
     private command: vscode.Disposable;
-    private languageClient: LanguageClient;
     private waitingForClientToken: vscode.CancellationTokenSource;
 
     constructor() {
+        super();
         this.command =
             vscode.commands.registerCommand("PowerShell.NewProjectFromTemplate", () => {
 
@@ -185,7 +185,7 @@ interface ITemplateDetails {
 }
 
 export const GetProjectTemplatesRequestType =
-    new RequestType<IGetProjectTemplatesRequestArgs, IGetProjectTemplatesResponseBody, string, void>(
+    new RequestType<IGetProjectTemplatesRequestArgs, IGetProjectTemplatesResponseBody, string>(
         "powerShell/getProjectTemplates");
 
 interface IGetProjectTemplatesRequestArgs {
@@ -198,7 +198,7 @@ interface IGetProjectTemplatesResponseBody {
 }
 
 export const NewProjectFromTemplateRequestType =
-    new RequestType<any, INewProjectFromTemplateResponseBody, string, void>(
+    new RequestType<any, INewProjectFromTemplateResponseBody, string>(
         "powerShell/newProjectFromTemplate");
 
 interface INewProjectFromTemplateRequestArgs {

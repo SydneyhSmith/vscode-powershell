@@ -1,17 +1,13 @@
-/*---------------------------------------------------------
- * Copyright (C) Microsoft Corporation. All rights reserved.
- *--------------------------------------------------------*/
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 
 import vscode = require("vscode");
-import { LanguageClient } from "vscode-languageclient";
 import Window = vscode.window;
-import { IFeature } from "../feature";
 import { ILogger } from "../logging";
 
-export class CodeActionsFeature implements IFeature {
+export class CodeActionsFeature implements vscode.Disposable {
     private applyEditsCommand: vscode.Disposable;
     private showDocumentationCommand: vscode.Disposable;
-    private languageClient: LanguageClient;
 
     constructor(private log: ILogger) {
         this.applyEditsCommand = vscode.commands.registerCommand("PowerShell.ApplyCodeActionEdits", (edit: any) => {
@@ -35,10 +31,6 @@ export class CodeActionsFeature implements IFeature {
     public dispose() {
         this.applyEditsCommand.dispose();
         this.showDocumentationCommand.dispose();
-    }
-
-    public setLanguageClient(languageclient: LanguageClient) {
-        this.languageClient = languageclient;
     }
 
     public showRuleDocumentation(ruleId: string) {

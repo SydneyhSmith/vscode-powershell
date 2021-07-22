@@ -1,7 +1,5 @@
-#
-# Copyright (c) Microsoft. All rights reserved.
-# Licensed under the MIT license. See LICENSE file in the project root for full license information.
-#
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 
 param(
     [string]$EditorServicesRepoPath = $null
@@ -16,6 +14,7 @@ Write-Host "`n### Extension Version: $($script:PackageJson.version) Extension Na
 
 #region Utility tasks
 
+# TODO: This needs to be a function, not a task.
 task ResolveEditorServicesPath -Before CleanEditorServices, BuildEditorServices, TestEditorServices, Package {
 
     $script:psesRepoPath = `
@@ -26,7 +25,7 @@ task ResolveEditorServicesPath -Before CleanEditorServices, BuildEditorServices,
             "$PSScriptRoot/../PowerShellEditorServices/"
         }
 
-    if (!(Test-Path $script:psesRepoPath)) {
+    if (!(Test-Path "$script:psesRepoPath/PowerShellEditorServices.build.ps1")) {
         # Clear the path so that it won't be used
         Write-Warning "`nThe PowerShellEditorServices repo cannot be found at path $script:psesRepoPath`n"
         $script:psesRepoPath = $null
@@ -34,14 +33,6 @@ task ResolveEditorServicesPath -Before CleanEditorServices, BuildEditorServices,
     else {
         $script:psesRepoPath = Resolve-Path $script:psesRepoPath
         $script:psesBuildScriptPath = Resolve-Path "$script:psesRepoPath/PowerShellEditorServices.build.ps1"
-    }
-}
-
-task UploadArtifacts {
-    if ($env:TF_BUILD) {
-        # SYSTEM_PHASENAME is the Job name.
-        Copy-Item -Path PowerShell-insiders.vsix `
-            -Destination "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/$($script:PackageJson.name)-$($script:PackageJson.version)-$env:SYSTEM_PHASENAME.vsix"
     }
 }
 
@@ -138,63 +129,23 @@ task UpdateReadme -If { $script:IsPreviewExtension } {
     }
 }
 
-task UpdatePackageJson {
-    if ($script:IsPreviewExtension) {
-        $script:PackageJson.name = "powershell-preview"
-        $script:PackageJson.displayName = "PowerShell Preview"
-        $script:PackageJson.description = "(Preview) Develop PowerShell scripts in Visual Studio Code!"
-        $script:PackageJson.preview = $true
-    } else {
-        $script:PackageJson.name = "powershell"
-        $script:PackageJson.displayName = "PowerShell"
-        $script:PackageJson.description = "Develop PowerShell scripts in Visual Studio Code!"
-        $script:PackageJson.preview = $false
-    }
-
-    $currentVersion = [version](($script:PackageJson.version -split "-")[0])
-    $currentDate = Get-Date
-
-    $revision = if ($currentDate.Month -eq $currentVersion.Minor) {
-        $currentVersion.Build + 1
-    } else {
-        0
-    }
-
-    $script:PackageJson.version = "$($currentDate.ToString('yyyy.M')).$revision"
-
-    if ($env:TF_BUILD) {
-        $script:PackageJson.version += "-CI.$env:BUILD_BUILDID"
-    }
-
-    $Utf8NoBomEncoding = [System.Text.UTF8Encoding]::new($false)
-    [System.IO.File]::WriteAllLines(
-        (Resolve-Path "$PSScriptRoot/package.json").Path,
-        ($script:PackageJson | ConvertTo-Json -Depth 100),
-        $Utf8NoBomEncoding)
-}
-
 task Package UpdateReadme, {
-
-    if ($script:psesBuildScriptPath) {
+    if ($script:psesBuildScriptPath -or $env:TF_BUILD) {
         Write-Host "`n### Copying PowerShellEditorServices module files" -ForegroundColor Green
         Copy-Item -Recurse -Force ..\PowerShellEditorServices\module\* .\modules
-    } elseif (Test-Path .\PowerShellEditorServices) {
-        Write-Host "`n### Moving PowerShellEditorServices module files" -ForegroundColor Green
-        Move-Item -Force .\PowerShellEditorServices\* .\modules
-        Remove-Item -Force .\PowerShellEditorServices
     } else {
         throw "Unable to find PowerShell EditorServices"
     }
 
-    Write-Host "`n### Packaging PowerShell-insiders.vsix`n" -ForegroundColor Green
-    exec { & node ./node_modules/vsce/out/vsce package --noGitHubIssueLinking }
-
-    # Change the package to have a static name for automation purposes
-    Move-Item -Force .\$($script:PackageJson.name)-$($script:PackageJson.version).vsix .\PowerShell-insiders.vsix
+    $packageName = "$($script:PackageJson.name)-$($script:PackageJson.version).vsix"
+    Write-Host "`n### Packaging $packageName`n" -ForegroundColor Green
+    exec { & node ./node_modules/vsce/out/vsce package --no-gitHubIssueLinking }
 
     if ($env:TF_BUILD) {
-        Copy-Item -Verbose -Recurse "./PowerShell-insiders.vsix" "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/PowerShell-insiders.vsix"
-        Copy-Item -Verbose -Recurse "./scripts/Install-VSCode.ps1" "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/Install-VSCode.ps1"
+        $artifactsPath = "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/vscode-powershell/"
+        "./$packageName", "./scripts/Install-VSCode.ps1" | ForEach-Object {
+            Copy-Item -Verbose -Recurse $_ $artifactsPath
+        }
     }
 }
 
@@ -203,4 +154,4 @@ task Package UpdateReadme, {
 # The set of tasks for a release
 task Release Clean, Build, Package
 # The default task is to run the entire CI build
-task . CleanAll, BuildAll, Test, UpdatePackageJson, Package, UploadArtifacts
+task . CleanAll, BuildAll, Test, Package

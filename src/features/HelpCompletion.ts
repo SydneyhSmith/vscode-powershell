@@ -1,16 +1,16 @@
-/*---------------------------------------------------------
- * Copyright (C) Microsoft Corporation. All rights reserved.
- *--------------------------------------------------------*/
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 
 import { Disposable, EndOfLine, Position, Range, SnippetString,
     TextDocument, TextDocumentChangeEvent, window, workspace } from "vscode";
-import { LanguageClient, RequestType } from "vscode-languageclient";
-import { IFeature } from "../feature";
+import { RequestType } from "vscode-languageclient";
+import { LanguageClient } from "vscode-languageclient/node";
 import { Logger } from "../logging";
 import Settings = require("../settings");
+import { LanguageClientConsumer } from "../languageClientConsumer";
 
 export const CommentHelpRequestType =
-    new RequestType<any, any, void, void>("powerShell/getCommentHelp");
+    new RequestType<any, any, void>("powerShell/getCommentHelp");
 
 interface ICommentHelpRequestParams {
     documentUri: string;
@@ -24,16 +24,16 @@ interface ICommentHelpRequestResult {
 
 enum SearchState { Searching, Locked, Found }
 
-export class HelpCompletionFeature implements IFeature {
+export class HelpCompletionFeature extends LanguageClientConsumer {
     private helpCompletionProvider: HelpCompletionProvider;
-    private languageClient: LanguageClient;
     private disposable: Disposable;
     private settings: Settings.ISettings;
 
     constructor(private log: Logger) {
+        super();
         this.settings = Settings.load();
 
-        if (this.settings.helpCompletion !== Settings.HelpCompletion.Disabled) {
+        if (this.settings.helpCompletion !== Settings.CommentType.Disabled) {
             this.helpCompletionProvider = new HelpCompletionProvider();
             const subscriptions = [];
             workspace.onDidChangeTextDocument(this.onEvent, this, subscriptions);
@@ -55,6 +55,11 @@ export class HelpCompletionFeature implements IFeature {
     }
 
     public async onEvent(changeEvent: TextDocumentChangeEvent): Promise<void> {
+        // If it's not a PowerShell script, we don't care about it.
+        if (changeEvent.document.languageId !== "powershell") {
+            return;
+        }
+
         if (!(changeEvent && changeEvent.contentChanges)) {
             this.log.writeWarning(`<${HelpCompletionFeature.name}>: ` +
                 `Bad TextDocumentChangeEvent message: ${JSON.stringify(changeEvent)}`);
@@ -166,7 +171,7 @@ class HelpCompletionProvider {
         const result = await this.langClient.sendRequest(CommentHelpRequestType, {
             documentUri: doc.uri.toString(),
             triggerPosition: triggerStartPos,
-            blockComment: this.settings.helpCompletion === Settings.HelpCompletion.BlockComment,
+            blockComment: this.settings.helpCompletion === Settings.CommentType.BlockComment,
         });
 
         if (!(result && result.content)) {
